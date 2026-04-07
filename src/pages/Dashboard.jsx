@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { DashboardContext } from '../context/DashboardContext';
 import WaktuTungguCard from '../components/WaktuTunggu';
@@ -6,12 +6,41 @@ import { tColor, sColor } from '../data';
 
 const Dashboard = () => {
   const { tanks, iot, suhu, pasienWk, toggleIoT } = useContext(DashboardContext);
+  const cctvRef = useRef(null);
+  const [cctvScroll, setCctvScroll] = useState(0);
+  const iotRef = useRef(null);
+  const [iotScroll, setIotScroll] = useState(0);
 
   const warnTanks = tanks.filter(t => t.pct < 60).length;
   const normTanks = tanks.filter(t => t.pct >= 60).length;
   const activeIoT = iot.filter(i => i.on).length;
   const hotSuhu = suhu.filter(s => s.t >= 30).length;
   const maxPasien = Math.max(...pasienWk);
+
+  const scrollContainer = (ref, dir) => {
+    if (ref.current) {
+      const scrollAmt = ref.current.clientWidth;
+      ref.current.scrollBy({ left: dir * scrollAmt, behavior: 'smooth' });
+    }
+  };
+
+  const jumpToScroll = (ref, e) => {
+    if (ref.current) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        const scrollPos = pct * (ref.current.scrollWidth - ref.current.clientWidth);
+        ref.current.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    }
+  };
+
+  const handleScroll = (ref, setScroll) => {
+    const el = ref.current;
+    if (el) {
+      const pct = el.scrollLeft / (el.scrollWidth - el.clientWidth);
+      setScroll(pct || 0);
+    }
+  };
+
   const generateSparkline = (data, color, label) => {
     const min = Math.min(...data) * 0.8;
     const max = Math.max(...data) * 1.1;
@@ -142,15 +171,22 @@ const Dashboard = () => {
             </div>
             <span className="badge b-live" style={{ textTransform: 'uppercase' }}><span className="ldot"></span>LIVE</span>
           </div>
-          <div className="cb">
-            <div className="ccg">
-              {[1, 2, 3, 4].map(num => (
+          <div className="cb cb-scroll">
+            <div className="ccg" ref={cctvRef} onScroll={() => handleScroll(cctvRef, setCctvScroll)}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                 <div key={num} className="ccc">
                   <div className="cam-ico">📷</div>
                   <span className="cam-lb">CAM {num}</span>
                   <span className="cam-lv"><span className="ldot"></span>LIVE</span>
                 </div>
               ))}
+            </div>
+            <div className="ccc-nav">
+              <button className="nav-btn" onClick={() => scrollContainer(cctvRef, -1)}>&lt;</button>
+              <div className="nav-bar-wrap" onClick={(e) => jumpToScroll(cctvRef, e)} style={{ cursor: 'pointer' }}>
+                <div className="nav-bar-thumb" style={{ transform: `translateX(${cctvScroll * 100}%)` }}></div>
+              </div>
+              <button className="nav-btn" onClick={() => scrollContainer(cctvRef, 1)}>&gt;</button>
             </div>
           </div>
           <div className="cf">
@@ -168,7 +204,7 @@ const Dashboard = () => {
             </div>
             <span className="badge" style={{ background: 'rgba(168,85,247,.12)', color: '#c084fc', border: '1px solid rgba(168,85,247,.2)', textTransform: 'uppercase' }}>Hari ini</span>
           </div>
-          <div className="cb" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="cb" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {generateSparkline(pasienWk.map(v => Math.floor(v * 0.73)), '#34d399', 'Rawat Jalan')}
             {generateSparkline(pasienWk.map(v => Math.floor(v * 0.27)), '#a78bfa', 'Rawat Inap')}
           </div>
@@ -190,15 +226,22 @@ const Dashboard = () => {
             </div>
             <span className="badge b-amber" style={{ textTransform: 'uppercase' }}>{activeIoT} Aktif</span>
           </div>
-          <div className="cb">
-            <div className="iotg">
-              {iot.slice(0, 6).map((d, i) => (
+          <div className="cb cb-scroll">
+            <div className="iotg" ref={iotRef} onScroll={() => handleScroll(iotRef, setIotScroll)}>
+              {iot.slice(0, 12).map((d, i) => (
                 <div key={i} className={`iotm ${d.on ? 'on' : ''}`} onClick={() => toggleIoT(i)}>
                   <div className="iot-ico">{d.i}</div>
                   <div className="iot-nm">{d.n}</div>
                   <div className={`iot-st ${d.on ? 'on' : 'off'}`}>{d.on ? 'ON' : 'OFF'}</div>
                 </div>
               ))}
+            </div>
+            <div className="ccc-nav">
+              <button className="nav-btn" onClick={() => scrollContainer(iotRef, -1)}>&lt;</button>
+              <div className="nav-bar-wrap" onClick={(e) => jumpToScroll(iotRef, e)} style={{ cursor: 'pointer' }}>
+                <div className="nav-bar-thumb" style={{ transform: `translateX(${iotScroll * 100}%)` }}></div>
+              </div>
+              <button className="nav-btn" onClick={() => scrollContainer(iotRef, 1)}>&gt;</button>
             </div>
           </div>
           <div className="cf">

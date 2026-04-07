@@ -178,7 +178,12 @@ body {
 
 .cb {
     padding: 10px 14px;
-    flex: 1
+    flex: 1;
+}
+
+.cb-scroll {
+    display: flex;
+    flex-direction: column;
 }
 
 .cf {
@@ -309,20 +314,40 @@ body {
 /* CCTV MINI */
 .ccg {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px
+    grid-template-rows: repeat(2, 100px);
+    grid-auto-flow: column;
+    grid-auto-columns: calc(50% - 4px);
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ccg::-webkit-scrollbar {
+    display: none; /* Hide for Chrome/Safari */
 }
 
 .ccc {
     background: #080d17;
     border-radius: 7px;
-    aspect-ratio: 16/9;
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     border: 1px solid var(--bord);
-    overflow: hidden
+    overflow: hidden;
+    scroll-snap-align: start;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.ccc:hover {
+    border-color: var(--cyan);
+    transform: scale(0.98);
 }
 
 .ccc::before {
@@ -360,7 +385,55 @@ body {
     gap: 2px
 }
 
-/* CHART MINI */
+/* CCTV NAVIGATION */
+.ccc-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto; /* Pushes to bottom of .cb */
+    padding-top: 14px;
+    margin-bottom: 6px; /* Spasi sedikit sebelum garis bawah */
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--bord);
+    color: var(--text2);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+
+.nav-bar-wrap {
+    flex: 1;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--bord);
+}
+
+.nav-bar-thumb {
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    background: #64748b; /* Lighter gray for better visibility */
+    border-radius: 3px;
+    transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+    will-change: transform;
+}
 .bars-mini {
     display: flex;
     align-items: flex-end;
@@ -399,18 +472,33 @@ body {
 /* IOT MINI */
 .iotg {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 5px
+    grid-template-rows: repeat(2, 55px); /* Reverted to compact size */
+    grid-auto-flow: column;
+    grid-auto-columns: calc(33.333% - 7px); /* 3 items per column visible */
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.iotg::-webkit-scrollbar {
+    display: none;
 }
 
 .iotm {
     background: var(--surf2);
     border-radius: 7px;
-    padding: 7px 5px;
+    padding: 8px 5px;
     text-align: center;
     border: 1px solid var(--bord);
     cursor: pointer;
-    transition: all .2s
+    transition: all .2s;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .iotm.on {
@@ -668,11 +756,11 @@ body {
 
 /* CCTV FULL */
 .cg-full {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 0 20px 15px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 0 20px;
+    margin-bottom: 30px;
 }
 .cg-full::-webkit-scrollbar {
     height: 8px;
@@ -687,8 +775,7 @@ body {
 }
 
 .cf-cam {
-    flex: 0 0 auto;
-    width: 260px;
+    width: 100%;
     background: #080d17;
     border: 1px solid var(--bord);
     border-radius: 11px;
@@ -739,8 +826,82 @@ body {
 
 .cf-lv {
     position: absolute;
-    top: 7px;
-    right: 7px
+    top: 10px;
+    right: 10px;
+}
+
+/* CAM MODAL FULLSCREEN */
+.cam-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.cam-modal-cnt {
+    width: 100%;
+    max-width: 1000px;
+    background: #080d17;
+    border: 1px solid var(--bord);
+    border-radius: 16px;
+    position: relative;
+    aspect-ratio: 16/9;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cam-modal-cnt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255, 255, 255, .01) 3px, rgba(255, 255, 255, .01) 6px);
+    pointer-events: none;
+}
+
+.cam-modal-close {
+    position: absolute;
+    top: -45px;
+    right: 0;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.cam-modal-close:hover {
+    opacity: 1;
+}
+
+.cam-modal-close::before {
+    content: '✕';
+    font-size: 18px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 /* PASIEN */
@@ -874,11 +1035,11 @@ body {
 
 /* IOT FULL */
 .ig-full {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 0 20px 15px 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 0 20px;
+    margin-bottom: 30px;
 }
 .ig-full::-webkit-scrollbar {
     height: 8px;
@@ -893,8 +1054,7 @@ body {
 }
 
 .ic-full {
-    flex: 0 0 auto;
-    width: 180px;
+    width: 100%;
     background: var(--surf);
     border: 1px solid var(--bord);
     border-radius: 11px;
