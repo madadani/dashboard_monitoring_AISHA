@@ -23,6 +23,17 @@ export const initialSuhu = [
 export const pasienWk = [112,128,135,119,145,138,142];
 export const depts = [{n:'Penyakit Dalam',v:38},{n:'Bedah',v:22},{n:'Anak',v:18},{n:'Kandungan',v:15},{n:'Jantung',v:28},{n:'Saraf',v:12}];
 
+export const initialCctv = [
+  { id: 1, n: 'IGD Utama', v: '/igd_utama.mp4' },
+  { id: 2, n: 'Parkir Belakang', v: '/parkir_belakang.mp4' },
+  { id: 3, n: 'Ruang Tunggu Poli Lt 2', v: '/bangsal_cempaka.mp4' }, // Fallback to working video
+  { id: 4, n: 'Apotek Rawat Jalan', v: '/unit_dialisis.mp4' }, // Fallback to working video
+  { id: 5, n: 'Bangsal Cempaka', v: '/bangsal_cempaka.mp4' },
+  { id: 6, n: 'Unit Dialisis', v: '/unit_dialisis.mp4' },
+  { id: 7, n: 'Pintu Masuk Utama', v: '/igd_utama.mp4' }, 
+  { id: 8, n: 'Lobby', v: '/parkir_belakang.mp4' }, // Fallback to working video
+];
+
 export const tColor=p=>p<30?'#f87171':p<60?'#fbbf24':'#22d3ee';
 export const tBadge=p=>p<30?'b-red':p<60?'b-amber':'b-green';
 export const tLabel=p=>p<30?'KRITIS':p<60?'WARNING':'NORMAL';

@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { DashboardContext } from '../context/DashboardContext';
 import WaktuTungguCard from '../components/WaktuTunggu';
-import { tColor, sColor } from '../data';
+import { tColor, sColor, initialCctv } from '../data';
 
 const Dashboard = () => {
   const { tanks, iot, suhu, pasienWk, toggleIoT } = useContext(DashboardContext);
@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [cctvScroll, setCctvScroll] = useState(0);
   const iotRef = useRef(null);
   const [iotScroll, setIotScroll] = useState(0);
+  const [offlineCams, setOfflineCams] = useState({});
 
   const warnTanks = tanks.filter(t => t.pct < 60).length;
   const normTanks = tanks.filter(t => t.pct >= 60).length;
@@ -39,6 +40,10 @@ const Dashboard = () => {
       const pct = el.scrollLeft / (el.scrollWidth - el.clientWidth);
       setScroll(pct || 0);
     }
+  };
+
+  const handleCamError = (id) => {
+    setOfflineCams(prev => ({ ...prev, [id]: true }));
   };
 
   const generateSparkline = (data, color, label) => {
@@ -173,13 +178,29 @@ const Dashboard = () => {
           </div>
           <div className="cb cb-scroll">
             <div className="ccg" ref={cctvRef} onScroll={() => handleScroll(cctvRef, setCctvScroll)}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                <div key={num} className="ccc">
-                  <div className="cam-ico">📷</div>
-                  <span className="cam-lb">CAM {num}</span>
-                  <span className="cam-lv"><span className="ldot"></span>LIVE</span>
-                </div>
-              ))}
+              {initialCctv.map((cam, i) => {
+                return (
+                  <div key={cam.id} className="ccc">
+                    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                      <div className="rec-box" style={{ top: '6px', left: '6px', padding: '2px 5px', fontSize: '8px', gap: '4px' }}>
+                        <div className="rec-dot" style={{ width: '4px', height: '4px' }}></div>
+                        REC
+                      </div>
+                      <video 
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      >
+                        <source src={cam.v} type="video/mp4" />
+                      </video>
+                    </div>
+                    <span className="cam-lb">CAM {cam.id} — {cam.n}</span>
+                    <span className="cam-lv"><span className="ldot" style={{ background: 'var(--green)' }}></span>LIVE</span>
+                  </div>
+                );
+              })}
             </div>
             <div className="ccc-nav">
               <button className="nav-btn" onClick={() => scrollContainer(cctvRef, -1)}>&lt;</button>
@@ -190,7 +211,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="cf">
-            <span style={{ fontSize: '10px', color: 'var(--muted)' }}>8 Kamera Total</span>
+            <span style={{ fontSize: '10px', color: 'var(--muted)' }}>{initialCctv.length} Kamera Total</span>
             <Link to="/cctv" className="see-all">Lihat Semua →</Link>
           </div>
         </div>
