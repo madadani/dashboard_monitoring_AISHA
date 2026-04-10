@@ -32,7 +32,7 @@ const CCTV = () => {
           className="cam-img"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         >
-          <source src={cam.v} type="video/mp4" />
+          <source src={`${import.meta.env.BASE_URL}${cam.v}`} type="video/mp4" />
         </video>
       </div>
     );

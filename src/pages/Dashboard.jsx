@@ -193,7 +193,7 @@ const Dashboard = () => {
                         playsInline
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                       >
-                        <source src={cam.v} type="video/mp4" />
+                        <source src={`${import.meta.env.BASE_URL}${cam.v}`} type="video/mp4" />
                       </video>
                     </div>
                     <span className="cam-lb">CAM {cam.id} — {cam.n}</span>
